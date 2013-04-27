@@ -17,9 +17,6 @@ define(['jQuery'], function($) {
         this.currTime;
         this.currId;
 
-        this.timeoutfunc;
-
-
         for (var i = 0; i<this.trackCount; ++i) {
             this.FilesLoaded[i]=false;
         };
@@ -56,6 +53,7 @@ define(['jQuery'], function($) {
         this.events = {
             FILELOADED:     "fileLoaded",
             ALLFILESLOADED: "allFilesLoaded",
+            ENDOFSONG:      "endOfSong", 
         };
         //$(this).on("fileLoaded", function(event, id) {
         //    alert(id+" loaded!!!!");
@@ -96,8 +94,8 @@ define(['jQuery'], function($) {
             this.gainNode.disconnect(0);
         }
         if (typeof this.gainNode !== "undefined") {
-            this.sourceCurrent.disconnect(0);
             this.sourceCurrent.stop(0);
+            this.sourceCurrent.disconnect(0);
         }
 
         this.sourceCurrent = this.ctx.createBufferSource();
@@ -121,11 +119,11 @@ define(['jQuery'], function($) {
         this.currId = id;
         this.status = this.statuses.PLAY;
 
-        /* play next song if this one ends */
+        /* trigger event at the end of song */
         var that = this;
         clearTimeout(this.timeoutfunc);
         this.timeoutfunc = setTimeout(function() {
-            that.next();
+            $(that).trigger(that.events.ENDOFSONG);
         }, (this.buffer[id].duration+this.trackpause)*1000);
     };
 
@@ -150,7 +148,7 @@ define(['jQuery'], function($) {
         this.status = this.statuses.STOP;
         this.sourceCurrent.stop(0);
     };
-
+/*
     player.prototype.next = function() {
         if (this.currId > this.trackCount-1)
             return;
@@ -164,5 +162,6 @@ define(['jQuery'], function($) {
 
         this.play(--this.currId);
     };
+*/
     return player;
 });
